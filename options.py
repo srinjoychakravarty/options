@@ -1,17 +1,24 @@
 import os, xlrd, numpy
 
-# contingent claim, payoff when s&p 500 hits certain value
-def state_price_density(c_0303, strike_0303, st):
-    '''constructs a spread position and longs the call at k1 and shorts the call at k2 '''
+# constructs a spread position and longs the call at k1 and shorts the call at k2
+def state_price_density(c_0303, strike_0303, st):       
+    '''contingent claim, payoff when s&p 500 hits certain value'''
     N = len(c_0303)
-    P = numpy.zeros((N, 1))     # (N, 1) returns a 100 rows by 1 column matrix of zeros if N = 100
-    for n in range(0, N):
+    P = numpy.zeros((N, 1))             # (N, 1) returns a 100 rows by 1 column matrix of zeros if N = 100
+    total = 0
+    for n in range(0, N-1):
         if (n == 0):
             P[0] = 1 - ( (st - c_0303[0]) / strike_0303[0])
-            print(f"Base Case: {P[0]}")
+            total += P[0]
+            # print(f"Base Case: {P[0]}")
         else:
             P[n] = (1 - (c_0303[n] - c_0303[n-1]) ) / (strike_0303[n] - strike_0303[n - 1]) 
-            print(f"Recursive Case: {P[n]}")
+            total += P[n]
+            # print(f"Recursive Case: {P[n]}")
+
+    P[N-1] = 1 - numpy.sum(P[0:N-1])    # sum all values of the 100 (rows) x 1 (column) matrix and assigns it to the last row of the matrix
+    P = numpy.sort(P, axis = 0)         # sorts the values of the 100 rows in ascending order (smallest -> largest)
+    print(P)
             
 
 if __name__ == "__main__":
