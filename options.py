@@ -20,7 +20,11 @@ def state_price_density(c_0303, strike_0303, st):
     dividend = (P[1 : N] - P[0 : N - 1])
     divisor = numpy.array(strike_0303[1 : N]) - numpy.array(strike_0303[0 : N - 1])         # converts both lists to numpy as you cant substract list from a list
     SPD = numpy.divide(dividend, divisor)
-    print(SPD)
+    SPD = numpy.nan_to_num(SPD)                 # Replace NaN with zero and infinity with large finite numbers
+    SPD = SPD[2 : -1]
+    
+    return SPD
+
 
 if __name__ == "__main__":
     directory = os.getcwd()
@@ -86,3 +90,4 @@ if __name__ == "__main__":
     # print(f"Bid Ask Spread (Calls): {c_0303}")
 
     spd_0303 = state_price_density(c_0303, strike_0303, st)
+    print(f"SPD: {spd_0303}")
