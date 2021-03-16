@@ -10,16 +10,17 @@ def state_price_density(c_0303, strike_0303, st):
         if (n == 0):
             P[0] = 1 - ( (st - c_0303[0]) / strike_0303[0])
             total += P[0]
-            # print(f"Base Case: {P[0]}")
         else:
-            P[n] = (1 - (c_0303[n] - c_0303[n-1]) ) / (strike_0303[n] - strike_0303[n - 1]) 
+            P[n] = (1 - (c_0303[n] - c_0303[n - 1]) ) / (strike_0303[n] - strike_0303[n - 1]) 
             total += P[n]
-            # print(f"Recursive Case: {P[n]}")
 
-    P[N-1] = 1 - numpy.sum(P[0:N-1])    # sum all values of the 100 (rows) x 1 (column) matrix and assigns it to the last row of the matrix
-    P = numpy.sort(P, axis = 0)         # sorts the values of the 100 rows in ascending order (smallest -> largest)
-    print(P)
-            
+    P[N - 1] = 1 - numpy.sum(P[0 : N - 1])      # sum all values of the 100 (rows) x 1 (column) matrix and assigns it to the last row of the matrix
+    P = numpy.sort(P, axis = 0)                 # sorts the values of the 100 rows in ascending order (smallest -> largest)
+
+    dividend = (P[1 : N] - P[0 : N - 1])
+    divisor = numpy.array(strike_0303[1 : N]) - numpy.array(strike_0303[0 : N - 1])         # converts both lists to numpy as you cant substract list from a list
+    SPD = numpy.divide(dividend, divisor)
+    print(SPD)
 
 if __name__ == "__main__":
     directory = os.getcwd()
