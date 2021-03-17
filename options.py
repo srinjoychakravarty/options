@@ -1,5 +1,15 @@
 import os, xlrd, numpy
 
+def toNumber(e):
+    '''regular expression to convert all non-numerics to 0'''
+    if type(e) != str:
+        return e
+    if re.match("^-?\d+?\.\d+?$", e):
+        return float(e)
+    if re.match("^-?\d+?$", e):
+        return int(e)
+    return 0
+
 def state_price_density(c_0303, strike_0303, st):                            # constructs a spread position and longs the call at k1 and shorts the call at k2      
     '''contingent claim, payoff when s&p 500 hits certain value'''
     N = len(c_0303)
@@ -63,11 +73,20 @@ if __name__ == "__main__":
     workbook = xlrd.open_workbook(filepath, on_demand = True)
     sheet_names = workbook.sheet_names()
     worksheets = []
+   
     for i in range (0, len(sheet_names)):
         worksheets.append({sheet_names[i]: workbook.sheet_by_index(i)})
     state = 3819.72                                                                # state = total market value (top 500 US Securities) at time T (Mar 3, 2021)
-    options_expiring_0303 = worksheets[0].get('0303')                              # analysis for option contracts expiring Mar 3, 2021
-    (call_contract_count_0303, bids_0303, asks_0303, strikes_0303) = process_call_contracts(options_expiring_0303)
-    c_0303 = list_bid_ask_call_spreads(call_contract_count_0303, bids_0303, asks_0303)                  # list of BID-ASK SPREADS for CALL options on 3 Mar. 2021
-    spd_0303 = state_price_density(c_0303, strikes_0303, state)
-    print(spd_0303)
+    
+    spds = []
+
+    for i in range(0, len(worksheets)):
+        expiry_date = list(worksheets[i].keys())[0]
+        options_chain = worksheets[i].get(expiry_date)                                          # retrieves options chain for contracts at each expiry date
+        (call_contract_count, bids, asks, strikes) = process_call_contracts(options_chain)      # lists key metrics of CALL contracts from options chain
+        c_ = list_bid_ask_call_spreads(call_contract_count, bids, asks)                         # list of BID-ASK SPREADS for CALL options at each expiry date
+        spd = state_price_density(c_, strikes, state)                                           # returns state price densities at each expiry date
+        spds.append({expiry_date: {'spd': spd, 'strike': strikes}})
+
+    print(len(spds))
+    
