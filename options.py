@@ -1,14 +1,5 @@
 import os, xlrd, numpy
-
-def toNumber(e):
-    '''regular expression to convert all non-numerics to 0'''
-    if type(e) != str:
-        return e
-    if re.match("^-?\d+?\.\d+?$", e):
-        return float(e)
-    if re.match("^-?\d+?$", e):
-        return int(e)
-    return 0
+import matplotlib.pyplot
 
 def state_price_density(c_0303, strike_0303, st):                            # constructs a spread position and longs the call at k1 and shorts the call at k2      
     '''contingent claim, payoff when s&p 500 hits certain value'''
@@ -86,7 +77,46 @@ if __name__ == "__main__":
         (call_contract_count, bids, asks, strikes) = process_call_contracts(options_chain)      # lists key metrics of CALL contracts from options chain
         c_ = list_bid_ask_call_spreads(call_contract_count, bids, asks)                         # list of BID-ASK SPREADS for CALL options at each expiry date
         spd = state_price_density(c_, strikes, state)                                           # returns state price densities at each expiry date
-        spds.append({expiry_date: {'spd': spd, 'strike': strikes}})
+        spds.append({'expiry_date': expiry_date, 'spd': spd, 'strike': strikes})
 
-    print(len(spds))
+    # print(len(spds))
+    # print(spds[0].get('0303').get('spd')[-2])
+
+    # x = numpy.linspace(0, 6*numpy.pi, 200)
+    # y = numpy.sin(x)
+
+   
+
+
+
+    # (rows, columns) = spd_0303.shape
+    # print(f"Rows: {rows}")
+    # print(f"Columns: {columns}")
+    # print(spd_0303[95][98])
+
+
+    # stems = list(range(1, rows + 1)) 
+    # data = []
+    # for i in range(0, rows):
+    #     print(spd_0303[i])
+    #     data.append(spd_0303[i])
+
+  
+    # matplotlib.pyplot.stem(stems, data)
+
+    spd_0303 = spds[0]
+    expiry_date = spd_0303.get('expiry_date')
+    spd_0303_data = spd_0303.get('spd')
+    matplotlib.pyplot.title(f"Call Option Expires: {expiry_date[0:2]}/{expiry_date[2:4]}")
+    matplotlib.pyplot.xlabel('Dollars ($)')
+    matplotlib.pyplot.ylabel('y-axis')
+    matplotlib.pyplot.plot(spd_0303_data,)
+    matplotlib.pyplot.show()
     
+
+
+
+
+    # matplotlib.pyplot.stem(x, y, markerfmt=" ")
+    # matplotlib.pyplot.stem(spd_0303)
+    # matplotlib.pyplot.show()
