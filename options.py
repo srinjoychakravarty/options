@@ -58,9 +58,33 @@ def list_bid_ask_call_spreads(call_contract_count, bids, asks):
         call_spreads.append( ( ( bids[i] + asks[i] ) / 2) )
     return call_spreads
 
-def subplot_contracts():
-    '''charts all options contracts using matplotlib'''
-    pass
+def plot_contracts(spds):
+    '''iterates and charts out state price densities for options contracts using matplotlib'''
+    
+    subplots = [221, 222, 223, 224, 225, 226]
+    colours = ["blue", "orange", "green", "grey", "red", "black"]
+    markers = ["o", "D", "o", "D", "o", "D"]
+
+    for i in range(0, len(spds)):
+
+        current_spd = spds[i]
+        expiry_date = current_spd.get('expiry_date')
+        current_spd_data = current_spd.get('spd')
+
+        figure = matplotlib.pyplot.figure()
+        axis = figure.add_subplot(subplots[i])
+        
+        axis.set_title(f"Call Option Expires: {expiry_date[0:2]}/{expiry_date[2:4]}")
+        axis.set_xlabel('Dollars ($)')
+        axis.set_ylabel('Bid / Ask Spread')
+        axis.text(0.99, 0.5, 'General rule: Low spread < 0.3 = more liquid, willing market', style = 'italic', verticalalignment = 'bottom', horizontalalignment = 'right', transform = axis.transAxes, color = 'blue', fontsize = 6)
+        #axis.plot(current_spd_data)
+        axis.plot(current_spd_data, marker = markers[i], color = colours[i], alpha = 0.3)
+        matplotlib.pyplot.axhline(y = 0.31, color = 'r', linestyle = '-', label = 'less liquid spread' )
+        matplotlib.pyplot.axhline(y = 0.29, color = 'b', linestyle = '--', label = 'more liquid spread' )
+        matplotlib.pyplot.legend()
+        matplotlib.pyplot.show()
+
 
 if __name__ == "__main__":
     directory = os.getcwd()
@@ -73,7 +97,7 @@ if __name__ == "__main__":
         worksheets.append({sheet_names[i]: workbook.sheet_by_index(i)})
     state = 3819.72                                                                # state = total market value (top 500 US Securities) at time T (Mar 3, 2021)
     
-    spds = []
+    call_spds = []
 
     for i in range(0, len(worksheets)):
         expiry_date = list(worksheets[i].keys())[0]
@@ -81,20 +105,22 @@ if __name__ == "__main__":
         (call_contract_count, bids, asks, strikes) = process_call_contracts(options_chain)      # lists key metrics of CALL contracts from options chain
         c_ = list_bid_ask_call_spreads(call_contract_count, bids, asks)                         # list of BID-ASK SPREADS for CALL options at each expiry date
         spd = state_price_density(c_, strikes, state)                                           # returns state price densities at each expiry date
-        spds.append({'expiry_date': expiry_date, 'spd': spd, 'strike': strikes})
+        call_spds.append({'expiry_date': expiry_date, 'spd': spd, 'strike': strikes})
 
-    spd_0303 = spds[0]
-    expiry_date = spd_0303.get('expiry_date')
-    spd_0303_data = spd_0303.get('spd')
+    plot_contracts(call_spds)
 
-    figure = matplotlib.pyplot.figure()
-    axis = figure.add_subplot(111)
-    axis.set_title(f"Call Option Expires: {expiry_date[0:2]}/{expiry_date[2:4]}")
-    axis.set_xlabel('Dollars ($)')
-    axis.set_ylabel('Bid / Ask Spread')
-    axis.text(0.99, 0.5, 'General rule: Low spread < 0.3 = more liquid, willing market', style='italic', verticalalignment='bottom', horizontalalignment='right', transform = axis.transAxes, color = 'blue', fontsize = 10)
-    axis.plot(spd_0303_data)
-    matplotlib.pyplot.axhline(y = 0.31, color = 'r', linestyle = '-', label = 'less liquid spread' )
-    matplotlib.pyplot.axhline(y = 0.29, color = 'b', linestyle = '--', label = 'more liquid spread' )
-    matplotlib.pyplot.legend()
-    matplotlib.pyplot.show()
+    # spd_0303 = call_spds[0]
+    # expiry_date = spd_0303.get('expiry_date')
+    # spd_0303_data = spd_0303.get('spd')
+
+    # figure = matplotlib.pyplot.figure()
+    # axis = figure.add_subplot(111)
+    # axis.set_title(f"Call Option Expires: {expiry_date[0:2]}/{expiry_date[2:4]}")
+    # axis.set_xlabel('Dollars ($)')
+    # axis.set_ylabel('Bid / Ask Spread')
+    # axis.text(0.99, 0.5, 'General rule: Low spread < 0.3 = more liquid, willing market', style='italic', verticalalignment='bottom', horizontalalignment='right', transform = axis.transAxes, color = 'blue', fontsize = 10)
+    # axis.plot(spd_0303_data)
+    # matplotlib.pyplot.axhline(y = 0.31, color = 'r', linestyle = '-', label = 'less liquid spread' )
+    # matplotlib.pyplot.axhline(y = 0.29, color = 'b', linestyle = '--', label = 'more liquid spread' )
+    # matplotlib.pyplot.legend()
+    # matplotlib.pyplot.show()
