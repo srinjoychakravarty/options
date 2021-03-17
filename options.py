@@ -57,7 +57,11 @@ def list_bid_ask_call_spreads(call_contract_count, bids, asks):
     for i in range (0, call_contract_count):
         call_spreads.append( ( ( bids[i] + asks[i] ) / 2) )
     return call_spreads
-    
+
+def subplot_contracts():
+    '''charts all options contracts using matplotlib'''
+    pass
+
 if __name__ == "__main__":
     directory = os.getcwd()
     filepath = f"{directory}/OPTIONS.xls"
@@ -79,44 +83,18 @@ if __name__ == "__main__":
         spd = state_price_density(c_, strikes, state)                                           # returns state price densities at each expiry date
         spds.append({'expiry_date': expiry_date, 'spd': spd, 'strike': strikes})
 
-    # print(len(spds))
-    # print(spds[0].get('0303').get('spd')[-2])
-
-    # x = numpy.linspace(0, 6*numpy.pi, 200)
-    # y = numpy.sin(x)
-
-   
-
-
-
-    # (rows, columns) = spd_0303.shape
-    # print(f"Rows: {rows}")
-    # print(f"Columns: {columns}")
-    # print(spd_0303[95][98])
-
-
-    # stems = list(range(1, rows + 1)) 
-    # data = []
-    # for i in range(0, rows):
-    #     print(spd_0303[i])
-    #     data.append(spd_0303[i])
-
-  
-    # matplotlib.pyplot.stem(stems, data)
-
     spd_0303 = spds[0]
     expiry_date = spd_0303.get('expiry_date')
     spd_0303_data = spd_0303.get('spd')
-    matplotlib.pyplot.title(f"Call Option Expires: {expiry_date[0:2]}/{expiry_date[2:4]}")
-    matplotlib.pyplot.xlabel('Dollars ($)')
-    matplotlib.pyplot.ylabel('y-axis')
-    matplotlib.pyplot.plot(spd_0303_data,)
+
+    figure = matplotlib.pyplot.figure()
+    axis = figure.add_subplot(111)
+    axis.set_title(f"Call Option Expires: {expiry_date[0:2]}/{expiry_date[2:4]}")
+    axis.set_xlabel('Dollars ($)')
+    axis.set_ylabel('Bid / Ask Spread')
+    axis.text(0.99, 0.5, 'General rule: Low spread < 0.3 = more liquid, willing market', style='italic', verticalalignment='bottom', horizontalalignment='right', transform = axis.transAxes, color = 'blue', fontsize = 10)
+    axis.plot(spd_0303_data)
+    matplotlib.pyplot.axhline(y = 0.31, color = 'r', linestyle = '-', label = 'less liquid spread' )
+    matplotlib.pyplot.axhline(y = 0.29, color = 'b', linestyle = '--', label = 'more liquid spread' )
+    matplotlib.pyplot.legend()
     matplotlib.pyplot.show()
-    
-
-
-
-
-    # matplotlib.pyplot.stem(x, y, markerfmt=" ")
-    # matplotlib.pyplot.stem(spd_0303)
-    # matplotlib.pyplot.show()
